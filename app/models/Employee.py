@@ -10,11 +10,11 @@ class Employee(db.Model):
     ppsn: so.Mapped[str] = so.mapped_column(sa.String(16), index=True, unique=True)
     name: so.Mapped[str] = so.mapped_column(sa.String(128), index=True)
     email: so.Mapped[Optional[str]] = so.mapped_column(sa.String(128), index=True, unique=True)
-    address: so.Mapped[str] = so.mapped_column(sa.String(256), index=False)
-    salary: so.Mapped[float] = so.mapped_column(sa.Numeric(8, 2))
+    address: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256), index=False)
+    salary: so.Mapped[Optional[float]] = so.mapped_column(sa.Numeric(8, 2))
 
-    department_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Department.id), index=True)
-    department: so.Mapped[Department] = so.relationship(back_populates='employees')
+    department_id: so.Mapped[Optional[int]] = so.mapped_column(sa.ForeignKey(Department.id), index=True)
+    department: so.Mapped[Optional[Department]] = so.relationship(back_populates='employees')
 
     # Many-to-many relationship with Project
     projects: so.Mapped['Project'] = so.relationship(
@@ -42,8 +42,13 @@ class Employee(db.Model):
         if include_department and self.department:
             data['department'] = self.department.to_dict(include_employees=False)
         if include_projects:
-            data['projects'] = [project.to_dict() for project in self.projects]
-
+            # Check if self.projects is iterable (like a list)
+            if isinstance(self.projects, list):
+                data['projects'] = [project.to_dict(include_employees=False) for project in self.projects]
+            else:
+                # If it's not a list, treat it as a single project and put it in a list
+                data['projects'] = [self.projects.to_dict(include_employees=False)] if self.projects else []
+        
         return data
 
 from app.models.Project import Project

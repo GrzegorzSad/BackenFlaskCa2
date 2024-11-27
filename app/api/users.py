@@ -5,7 +5,7 @@ from app.api.errors import success_response, error_response
 from app.models import User
 from flask import request
 
-# Registration Route (POST /register)
+# register
 @bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -22,14 +22,14 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    # Optionally return a token after successful registration
+    # return token after successful registration
     token = user.get_token()
     db.session.commit()
     
     return success_response(201, {'token': token})
 
 
-# Login Route (POST /login)
+# Login
 @bp.route('/login', methods=['POST'])
 @basic_auth.login_required
 def login():
@@ -43,13 +43,13 @@ def login():
     return success_response(200, {'token': token})
 
 
-# Logout Route (DELETE /logout)
+# Logout
 @bp.route('/logout', methods=['DELETE'])
 @token_auth.login_required
 def logout():
     user = token_auth.current_user()
 
-    # Revoke the token (effectively logs the user out)
+    # remove token
     user.remove_token()
     db.session.commit()
 

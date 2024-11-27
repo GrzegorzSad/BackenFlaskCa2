@@ -4,13 +4,14 @@ import sqlalchemy as sa
 import sqlalchemy.orm as so
 from app import db
 from app.models.Employee import Employee
+from typing import Optional
 
 class Project(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     title: so.Mapped[str] = so.mapped_column(sa.String(128), index=True)
     description: so.Mapped[str] = so.mapped_column(sa.String(255))
-    start_date: so.Mapped[date] = so.mapped_column(sa.Date)
-    end_date: so.Mapped[date] = so.mapped_column(sa.Date)
+    start_date: so.Mapped[Optional[date]] = so.mapped_column(sa.Date)
+    end_date: so.Mapped[Optional[date]] = so.mapped_column(sa.Date)
 
     # Many-to-many relationship with Employee
     employees: so.Mapped[Employee] = so.relationship(
@@ -35,7 +36,5 @@ class Project(db.Model):
             data['start_date'] = self.start_date.isoformat()
             data['end_date'] = self.end_date.isoformat()
         if include_employees:
-            data['employees'] = [employee.to_dict(include_department=False) for employee in self.employees]
-
-
+            data['employees'] = [employee.to_dict(include_department=False, include_projects=False) for employee in self.employees]
         return data

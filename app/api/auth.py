@@ -9,7 +9,7 @@ token_auth = HTTPTokenAuth()
 
 @basic_auth.verify_password
 def verify_password(username, password):
-    user = db.session.scalar(sa.select(User).where(User.username == username))
+    user = db.session.scalar(sa.select(User).where(User.name == username))
     if user and user.check_password(password):
         return user
     
