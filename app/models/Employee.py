@@ -16,6 +16,11 @@ class Employee(db.Model):
     department_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Department.id), index=True)
     department: so.Mapped[Department] = so.relationship(back_populates='employees')
 
+    # Many-to-many relationship with Project
+    projects: so.Mapped['Project'] = so.relationship(
+        'Project', secondary='employee_project', back_populates='employees'
+    )
+
     def __repr__(self):
         return f"<Employee {self.name}>"
 
@@ -24,7 +29,7 @@ class Employee(db.Model):
             if field in data:
                 setattr(self, field, data[field])
 
-    def to_dict(self, include_department=True, include_salary=False):
+    def to_dict(self, include_department=True, include_projects=True, include_salary=False):
         data = {
             'id': self.id,
             'ppsn': self.ppsn,
@@ -36,6 +41,9 @@ class Employee(db.Model):
             data['salary'] = float(self.salary)
         if include_department and self.department:
             data['department'] = self.department.to_dict(include_employees=False)
+        if include_projects:
+            data['projects'] = [project.to_dict() for project in self.projects]
 
         return data
 
+from app.models.Project import Project
