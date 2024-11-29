@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 import sqlalchemy.orm as so
-from app import db
+from app import db 
 from typing import Optional
 
 class Department(db.Model):
