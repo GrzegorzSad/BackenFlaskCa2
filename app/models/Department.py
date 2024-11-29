@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from app import db 
-from typing import Optional
+from typing import Optional, List
 
 class Department(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
@@ -9,7 +9,7 @@ class Department(db.Model):
     location: so.Mapped[str] = so.mapped_column(sa.String(128), index=False)
     website: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256), index=False)
 
-    employees: so.WriteOnlyMapped['Employee'] = so.relationship(back_populates='department')
+    employees: so.Mapped[list['Employee']] = so.relationship(back_populates='department')
 
     def __repr__(self):
         return f"<Department {self.title}>"
@@ -27,7 +27,13 @@ class Department(db.Model):
             'website': self.website,
         }
         if include_employees:
-            data['employees'] = [employee.to_dict(include_department=False) for employee in self.employees]
+            # Check if self.employees is iterable (like a list)
+            if isinstance(self.employees, list):
+                data['projects'] = [employee.to_dict(include_employees=False) for employee in self.employees]
+            else:
+                # If it's not a list, treat it as a single project and put it in a list
+                data['employees'] = [self.employees.to_dict(include_projects=False)] if self.employees else []
+
         return data
 
 from app.models.Employee import Employee

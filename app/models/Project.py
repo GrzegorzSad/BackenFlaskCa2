@@ -14,8 +14,8 @@ class Project(db.Model):
     end_date: so.Mapped[Optional[date]] = so.mapped_column(sa.Date)
 
     # Many-to-many relationship with Employee
-    employees: so.Mapped[Employee] = so.relationship(
-        'Employee', secondary='employee_project', back_populates='projects'
+    employees: so.Mapped[list[Employee]] = so.relationship(
+        'Employee', secondary='employee_project', back_populates='projects', uselist=True
     )
 
     def __repr__(self):
@@ -36,5 +36,11 @@ class Project(db.Model):
             data['start_date'] = self.start_date.isoformat()
             data['end_date'] = self.end_date.isoformat()
         if include_employees:
-            data['employees'] = [employee.to_dict(include_department=False, include_projects=False) for employee in self.employees]
+            # Check if self.employees is iterable (like a list)
+            if isinstance(self.employees, list):
+                data['employees'] = [employee.to_dict(include_department=False) for employee in self.employees]
+            else:
+                # If it's not a list, treat it as a single project and put it in a list
+                data['employees'] = [self.projects.to_dict(include_department=False)] if self.employees else []
+        
         return data

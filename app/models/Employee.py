@@ -17,8 +17,8 @@ class Employee(db.Model):
     department: so.Mapped[Optional[Department]] = so.relationship(back_populates='employees')
 
     # Many-to-many relationship with Project
-    projects: so.Mapped['Project'] = so.relationship(
-        'Project', secondary='employee_project', back_populates='employees'
+    projects: so.Mapped[list['Project']] = so.relationship(
+        'Project', secondary='employee_project', back_populates='employees', uselist=True
     )
 
     def __repr__(self):
