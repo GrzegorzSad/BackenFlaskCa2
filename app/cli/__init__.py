@@ -38,7 +38,7 @@ def seed_db():
         data = dict(
             name=faker.user_name(),
             email=faker.email(),
-            phone=faker.phone_number(),
+            phone=faker.numerify("#########"),
             password="password",
             address=faker.address()
         )

@@ -4,6 +4,7 @@ from app.api.auth import basic_auth, token_auth
 from app.api.errors import success_response, error_response
 from app.models import Project, Employee
 from flask import request
+from app.utils.email import send_email
 
 # Create
 @bp.route('/projects', methods=['POST'])
@@ -107,6 +108,12 @@ def add_employees_to_project(project_id):
     print(project.employees, 'project.employees')
     try:
         db.session.commit()
+
+        for employee in employees:
+            send_email(
+
+            )
+
         return success_response(200, message="employees added to project")
     except Exception as e:
         db.session.rollback()
@@ -143,3 +150,4 @@ def remove_employees_from_project(project_id):
     except Exception as e:
         db.session.rollback()
         return error_response(400)
+

@@ -2,11 +2,14 @@ from flask import Flask, request
 from werkzeug.http import HTTP_STATUS_CODES
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-
+from redis import Redis
+from rq import Queue
+from flask_mail import Mail
 from config import Config
 
 db = SQLAlchemy()
 migrate = Migrate()
+mail = Mail()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -14,6 +17,10 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
+
+    app.redis = Redis.from_url(app.config['REDIS_URL'])
+    app.task_queue = Queue('backend-api-tasks', connection=app.redis)
 
     from app.cli import bp as cli_bp
     app.register_blueprint(cli_bp)

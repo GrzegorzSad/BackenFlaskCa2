@@ -10,3 +10,13 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'app.db')
     
+    MAIL_SERVER='sandbox.smtp.mailtrap.io'
+    MAIL_PORT = 2525
+    MAIL_USERNAME = '9d5abcad6d7dc2'
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+
+    ADMINS = ['your-email@example.com']
+
+    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
